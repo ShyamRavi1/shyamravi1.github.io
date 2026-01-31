@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Be My Valentine?</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            background-color: #ffe6e6; /* Fallback pink */
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden; /* Prevents scrollbars when button moves */
+        }
+
+        .container {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-family: 'Pacifico', cursive;
+            color: #d32f2f;
+            font-size: 3rem;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        #yesBtn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #yesBtn:hover {
+            background-color: #45a049;
+            transform: scale(1.1);
+        }
+
+        #noBtn {
+            background-color: #f44336;
+            color: white;
+            position: relative; /* Allows us to move it with JS */
+        }
+
+        /* The hidden result container */
+        #resultContainer {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #resultGif {
+            max-width: 300px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            margin-top: 20px;
+        }
+
+        /* Floating Hearts Background Animation */
+        .heart {
+            position: absolute;
+            color: #ff9999;
+            opacity: 0.5;
+            z-index: 0;
+            animation: float 6s infinite ease-in;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="hearts-container"></div>
+
+    <div class="container" id="mainContainer">
+        <h1 id="questionText">Isha, will you be my valentine?</h1>
+        <img id="resultGif" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExd2cweXMydTE5azd4eGt2d3FhNWN2aGdoYndpbDE3eDBuaDk1emNrZCZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/jselj0uIFA5N9AKxC6/giphy.gif" alt="Fireworks">
+
+        <div class="btn-group">
+            <button id="yesBtn">Yes</button>
+            <button id="noBtn">No</button>
+        </div>
+    </div>
+
+    <div class="container" id="resultContainer">
+        <h1>Yay! ❤️</h1>
+        <img id="resultGif" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExd2cweXMydTE5azd4eGt2d3FhNWN2aGdoYndpbDE3eDBuaDk1emNrZCZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/NxgjDYxluo0sRjHw80/giphy.gif" alt="Fireworks">
+    </div>
+
+    <script>
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const mainContainer = document.getElementById('mainContainer');
+        const resultContainer = document.getElementById('resultContainer');
+        
+        let currentScale = 1;
+
+        // Function to move the "No" button
+        function moveNoButton() {
+            // Make the button smaller
+            currentScale = currentScale * 0.9; // Shrinks by 10% each time
+            noBtn.style.transform = `scale(${currentScale})`;
+            yesBtn.style.transform = `scale(${1/currentScale})`;
+
+            // Calculate random position within the window
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
+
+            // Apply new position
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = `${x}px`;
+            noBtn.style.top = `${y}px`;
+        }
+
+        // Trigger move on Hover (Desktop) and Click/Touch (Mobile)
+        noBtn.addEventListener('mouseover', moveNoButton);
+        noBtn.addEventListener('click', moveNoButton);
+        // noBtn.addEventListener('touchstart', (e) => {
+        //     e.preventDefault(); // prevents actual click
+        //     moveNoButton();
+        // });
+
+        // "Yes" button functionality
+        yesBtn.addEventListener('click', () => {
+            mainContainer.style.display = 'none';
+            resultContainer.style.display = 'flex';
+            
+            // Optional: Trigger confetti or extra effects here
+            createHearts();
+        });
+
+        // Background Hearts Animation Logic
+        function createHearts() {
+            const heartsContainer = document.getElementById('hearts-container');
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                heart.innerHTML = '❤';
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.fontSize = Math.random() * 20 + 20 + 'px';
+                heart.style.animationDuration = Math.random() * 3 + 2 + 's';
+                heartsContainer.appendChild(heart);
+
+                // Remove heart after animation
+                setTimeout(() => {
+                    heart.remove();
+                }, 5000);
+            }, 300);
+        }
+
+        // Start background hearts immediately
+        createHearts();
+
+    </script>
+</body>
+</html>
