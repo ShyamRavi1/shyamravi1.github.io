@@ -1,185 +1,150 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Be My Valentine?</title>
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-            background-color: #ffe6e6; /* Fallback pink */
-            font-family: 'Poppins', sans-serif;
-            overflow: hidden; /* Prevents scrollbars when button moves */
-        }
 
-        .container {
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        h1 {
-            font-family: 'Pacifico', cursive;
-            color: #d32f2f;
-            font-size: 3rem;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            align-items: center;
-        }
-
-        button {
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        #yesBtn {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        #yesBtn:hover {
-            background-color: #45a049;
-            transform: scale(1.1);
-        }
-
-        #noBtn {
-            background-color: #f44336;
-            color: white;
-            position: relative; /* Allows us to move it with JS */
-        }
-
-        /* The hidden result container */
-        #resultContainer {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        #resultGif {
-            max-width: 300px;
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-            margin-top: 20px;
-        }
-
-        /* Floating Hearts Background Animation */
-        .heart {
-            position: absolute;
-            color: #ff9999;
-            opacity: 0.5;
-            z-index: 0;
-            animation: float 6s infinite ease-in;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(100vh) scale(0); opacity: 0; }
-            50% { opacity: 0.8; }
-            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
-        }
-
-    </style>
-</head>
-<body>
-
-    <div id="hearts-container"></div>
-
-    <div class="container" id="mainContainer">
-        <h1 id="questionText">Isha, will you be my valentine?</h1>
-        <img id="resultGif" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExd2cweXMydTE5azd4eGt2d3FhNWN2aGdoYndpbDE3eDBuaDk1emNrZCZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/jselj0uIFA5N9AKxC6/giphy.gif" alt="Fireworks">
-
-        <div class="btn-group">
-            <button id="yesBtn">Yes</button>
-            <button id="noBtn">No</button>
-        </div>
-    </div>
-
-    <div class="container" id="resultContainer">
-        <h1>Yay! ❤️</h1>
-        <img id="resultGif" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExd2cweXMydTE5azd4eGt2d3FhNWN2aGdoYndpbDE3eDBuaDk1emNrZCZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/NxgjDYxluo0sRjHw80/giphy.gif" alt="Fireworks">
-    </div>
-
-    <script>
-        const yesBtn = document.getElementById('yesBtn');
-        const noBtn = document.getElementById('noBtn');
-        const mainContainer = document.getElementById('mainContainer');
-        const resultContainer = document.getElementById('resultContainer');
+<html><head>
+    <meta name="AUTHOR" content="Shyam Ravichandran (stolen from Daniel Groves who stole it from Cherie Galvex and more.)">
+    <title>Shyam Ravichandran</title>
+    </head>
+    
+    <body body="" style="background-color:#E0F2FE;">
         
-        let currentScale = 1;
+    <table border="0" cellpadding="10">
+    <tbody>
+    <tr valign="top">
+    <td>
+    <table border="0" cellpadding="5">
+    <tbody>
+    <tr>
+    
+    <td>
+    <p>
+    </p><h1>
+    Shyam Ravichandran<br>
+    </h1><h2> Ph.D. Student<br>
+    University of Illinois Chicago  </h2>
+    
+    <p><strong>Contact Information</strong><br>
+    Office: SEO 735<br>
+    E-mail: sravi42 (at) uic (dot) edu <br>
+    <br>
+    <b>Mailing address:</b> <br>
+    Department of Mathematics, Statistics, and Computer Science<br>
+    University of Illinois Chicago<br>
+    322 Science and Engineering Offices (M/C 249)<br>
+    851 S. Morgan St.<br>
+    Chicago, IL 60607-7045<br>
+    USA
+    
+     
+    </p></td>
+    
+    <td>
+        <div style="text-align: right;">
+            <a href="https://christpluso.github.io"><img  width="480" height="360" src="IMG_0031.jpeg" alt="a pic of me"></a>
+        </div>
+    
+   
 
-        // Function to move the "No" button
-        function moveNoButton() {
-            // Make the button smaller
-            currentScale = currentScale * 0.9; // Shrinks by 10% each time
-            noBtn.style.transform = `scale(${currentScale})`;
-            yesBtn.style.transform = `scale(${1/currentScale})`;
+    </td>
+    </tr></tbody>
+    </table>
+    
+    
+    <br>
+    
+    
+    <hr>
+    
+    <br>
+    <b> About Me </b>
+    
+    <br><br>
+    
+<div class="text" white-space:="" pre-line="">Hi! My name is Shyam Ravichandran and I’m a second-year Ph.D. student in Mathematical Computer Science. My research interests are broadly centered in Probability and Combinatorics, specifically their applications to Learning, Game Theory, and other problems in Theoretical Computer Science. Inside the department, I serve as the Co-President of the Mathematical Graduate Student Association (<a href="https://mgsa.math.uic.edu">MGSA</a>) alongside <a href="https://sites.google.com/view/naimanader/about/">Naima Nader</a>. Our department offers a uniquely collaborative environment through MGSA, which hosts our department tea and the Graduate Student Colloquium, fostering a rich community between subfields. Additionally, I serve as the organizer of the Graduate Computer Science Theory seminar with <a href="https://homepages.math.uic.edu/~cmizge2/">Clay Mizgerd</a>. Previously, I recently completed my undergrad at Purdue University where I double majored Applied Mathematics and Statistics while completing a certificate in Data Science. Outside the university, I am an avid traveler, basketball fan, and runner.  
+</div>
+<br>
+<hr>
+    <br>
+    <b> Service </b>
+    
+    <br><br>
+</li><li><b>Fall 2025-Present: </b> Graduate Computer Science Theory Seminar Co-Organizer (with Clay Mizgerd)   
+</li><li><b>Summer 2025-Present: </b> Math Graduate Student Association Co-President (with Naima Nader and <a href="https://homepages.math.uic.edu/~swinton/">Min Winton</a>)
+</li><li><b>Spring 2025-Present:</b> Directed Reading Program Mentor
+</li><li><b>Spring 2025-Present:</b> Symbols of Inclusion, Undergraduate Mentorship Organizer
 
-            // Calculate random position within the window
-            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
-            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
 
-            // Apply new position
-            noBtn.style.position = 'fixed';
-            noBtn.style.left = `${x}px`;
-            noBtn.style.top = `${y}px`;
-        }
 
-        // Trigger move on Hover (Desktop) and Click/Touch (Mobile)
-        noBtn.addEventListener('mouseover', moveNoButton);
-        noBtn.addEventListener('click', moveNoButton);
-        // noBtn.addEventListener('touchstart', (e) => {
-        //     e.preventDefault(); // prevents actual click
-        //     moveNoButton();
-        // });
+    <br>
 
-        // "Yes" button functionality
-        yesBtn.addEventListener('click', () => {
-            mainContainer.style.display = 'none';
-            resultContainer.style.display = 'flex';
-            
-            // Optional: Trigger confetti or extra effects here
-            createHearts();
-        });
+<br>
+<hr>
+    <br>
+    <b> Teaching </b>
+    
+    <br><br>
+</li><li><b>Spring 2026:</b> Combinatorics (MCS421), Graph Theory (MCS423), Numerical Analysis (MCS471)
+</li><li><b>Fall 2025:</b> Calculus I (Math 180)
+</li><li><b>Summer 2025: </b> <a href="https://sites.google.com/view/yspatuic/">Young Scholars Program</a> 
+<br/>
+</li><li><b>Fall 2024, Spring 2025:</b> Calculus II (Math 181)
 
-        // Background Hearts Animation Logic
-        function createHearts() {
-            const heartsContainer = document.getElementById('hearts-container');
-            setInterval(() => {
-                const heart = document.createElement('div');
-                heart.classList.add('heart');
-                heart.innerHTML = '❤';
-                heart.style.left = Math.random() * 100 + 'vw';
-                heart.style.fontSize = Math.random() * 20 + 20 + 'px';
-                heart.style.animationDuration = Math.random() * 3 + 2 + 's';
-                heartsContainer.appendChild(heart);
 
-                // Remove heart after animation
-                setTimeout(() => {
-                    heart.remove();
-                }, 5000);
-            }, 300);
-        }
 
-        // Start background hearts immediately
-        createHearts();
-
-    </script>
-</body>
-</html>
+    <br>
+    <br>
+    
+    <hr>
+    
+    <br>
+    
+    <b> Office Hours (Spring 2026) in MSLC </b>
+    
+    <br>
+    <br>
+    </li><li> <b>Monday:</b> 11-12 pm
+    </li><li> <b>Tuesday:</b> 1-3 pm
+    
+    
+    <br>
+    <br>
+    
+    <hr>
+    
+    
+    
+    <p><strong> Current Research Interests</strong><br>
+    <br>
+    
+    Probability Theory, Probabilistic Combinatorics, Theoretical Computer Science, Machine Learning
+    
+    <br>
+    
+    </p><hr>
+    
+    <p><font size="+1"><b><a href="Ravichandran_Shyam.pdf"> Current CV </a> </b> </font>
+    
+    
+    <br>
+    
+    </p><hr>
+    
+    <!-- <p><font size="+1"><b> Conferences:<br><br> </b></font><b>
+    
+    
+    <a href="https://www.math.uic.edu/conferences/cubes_man"> Cube complexes and 3-manifolds</a>, May 20-30, 2013 at UIC.
+    
+    <br><br>
+    
+    <a href="Conferences/2011/UICGGGTLogic/Workshop_August_2011/Main.html">Geometric group theory and logic: The elementary theory of groups</a>, August 2011, UIC.
+    
+    
+    <br><br> -->
+    
+    
+    
+    <!-- </b></p><hr><b>
+     --> 
+    <p><a target="_top" href="https://mscs.uic.edu/">Mathematics Department Home Page</a> </p>
+    
+    
+    </li></td></tr></tbody></table>
+    <div class="glasp-extension-toaster" style="display: block; width: 320px; margin: unset; padding: unset; border: unset; border-radius: unset; outline: unset; background-color: unset; box-shadow: unset; position: fixed; top: 40px; right: 24px; z-index: 9999;"></div><div class="glasp-extension" style="display: block; width: unset; margin: unset; padding: unset; border: unset; border-radius: unset; outline: unset; background-color: unset; box-shadow: unset; position: fixed; bottom: 16px; right: 16px; z-index: 9999;"></div></body></html>
