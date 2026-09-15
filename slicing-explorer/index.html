@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slicing Explorer — from area to volume</title>
+<meta name="author" content="Shyam Ravichandran">
+<meta name="description" content="Interactive visualizer for volumes by slicing and solids of revolution (Calc II / Math 181).">
+<!-- Plotly for the 2D + 3D graphs, math.js for parsing typed expressions -->
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.min.js"></script>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+         max-width: 1500px; margin: 0 auto; padding: 14px 18px; color: #14293d;
+         background: #E0F2FE; }
+  h1 { font-size: 22px; margin: 4px 0 2px; }
+  .sub { color: #486; margin: 0 0 12px; font-size: 14px; }
+  .row { margin-bottom: 10px; }
+  label { font-weight: 600; }
+  input[type=text] { padding: 3px 6px; border: 1px solid #9ab; border-radius: 4px; }
+  .shapes label { font-weight: 400; margin-right: 14px; white-space: nowrap; }
+  .hint { color: #789; font-size: 12px; }
+  #readout { margin: 8px 0 12px; font-size: 15px; }
+  #readout .built { color: #F58518; font-weight: 700; }
+  #readout .total { font-weight: 700; }
+  #readout .err { color: #c0392b; font-weight: 600; }
+  .panels { display: flex; flex-wrap: wrap; gap: 8px; }
+  #fig2d { width: 36%; min-width: 320px; height: 480px; }
+  #fig3d { width: 62%; min-width: 360px; height: 640px; }
+  code { background: #d6ecfb; padding: 1px 4px; border-radius: 3px; }
+  a { color: #1f6feb; }
+</style>
+</head>
+<body>
+  <h1>Slicing Explorer — from area to volume</h1>
+  <p class="sub">Type a curve, pick a cross-section shape, and drag the slider to build the solid left&nbsp;→&nbsp;right.
+     The area under the curve becomes the volume of a solid, one slice at a time.
+     &nbsp;<a href="../">&larr; back to homepage</a></p>
+
+  <div class="row shapes">
+    <label>Cross-section:</label>
+    <label><input type="radio" name="shape" value="disk" checked> Disk / washer (revolution)</label>
+    <label><input type="radio" name="shape" value="square"> Square</label>
+    <label><input type="radio" name="shape" value="semicircle"> Semicircle</label>
+    <label><input type="radio" name="shape" value="equilateral"> Equilateral triangle</label>
+    <label><input type="radio" name="shape" value="right"> Right triangle</label>
+    <label><input type="radio" name="shape" value="custom"> Custom outline</label>
+  </div>
+
+  <div class="row">
+    <label>f(x) =</label> <input type="text" id="f" value="2*x" size="14">
+    &nbsp;<label>g(x) =</label> <input type="text" id="g" value="" size="14" placeholder="0 (optional)">
+    &nbsp;<label>a =</label> <input type="text" id="a" value="0" size="4">
+    &nbsp;<label>b =</label> <input type="text" id="b" value="2" size="4">
+    &nbsp;<label><input type="checkbox" id="rects"> show Riemann rectangles</label>
+  </div>
+
+  <div class="row">
+    <label>Custom outline (y,z points; base runs 0,0 → 1,0):</label>
+    <input type="text" id="custom" value="0,0; 1,0; 1,0.6; 0.5,1.1; 0,0.6" size="42">
+    <span class="hint">← used only when “Custom” is selected</span>
+  </div>
+
+  <div class="row">
+    <label>Build the solid (sweep x): <span id="sval"></span></label><br>
+    <input type="range" id="s" min="0" max="2" value="2" step="0.02" style="width: 60%;">
+  </div>
+
+  <div id="readout"></div>
+
+  <div class="panels">
+    <div id="fig2d"></div>
+    <div id="fig3d"></div>
+  </div>
+
+<script>
+"use strict";
+// ---- resolution (kept modest so dragging stays smooth) -------------------
+const M = 44, NTH = 40, NPAR = 60;
+const SOLID = "#4C78A8", INNER = "#E45756", FACE = "#F58518",
+      REGION = "rgba(76,120,168,0.18)", SWEPT = "rgba(245,133,24,0.35)", CURVE = "#1b3a5b";
+
+const $ = id => document.getElementById(id);
+const linspace = (a, b, n) => Array.from({length: n}, (_, i) => a + (b - a) * i / (n - 1));
+const mean = arr => arr.reduce((p, c) => p + c, 0) / arr.length;
+
+// ---- expression parsing (math.js); returns x -> number -------------------
+function compileFn(text) {
+  const node = math.compile(text.replace(/\*\*/g, "^"));
+  return x => { const v = node.evaluate({ x }); return (typeof v === "number") ? v : NaN; };
+}
+
+// ---- Simpson numeric integration -----------------------------------------
+function integrate(fn, a, b, n = 600) {
+  if (b <= a) return 0;
+  if (n % 2) n++;
+  const h = (b - a) / n;
+  let s = fn(a) + fn(b);
+  for (let i = 1; i < n; i++) s += (i % 2 ? 4 : 2) * fn(a + i * h);
+  return s * h / 3;
+}
+
+// ---- cross-section outline templates (unit base 0,0 -> 1,0, rising in +z) -
+function densify(ty, tz, npar) {
+  const d = [0];
+  for (let i = 1; i < ty.length; i++) d.push(d[i - 1] + Math.hypot(ty[i] - ty[i - 1], tz[i] - tz[i - 1]));
+  const total = d[d.length - 1];
+  if (total === 0) return [ty, tz];
+  const uy = [], uz = [];
+  for (let k = 0; k < npar; k++) {
+    const u = total * k / (npar - 1);
+    let idx = 0;
+    while (idx < d.length - 2 && d[idx + 1] < u) idx++;
+    const t = (u - d[idx]) / ((d[idx + 1] - d[idx]) || 1);
+    uy.push(ty[idx] + t * (ty[idx + 1] - ty[idx]));
+    uz.push(tz[idx] + t * (tz[idx + 1] - tz[idx]));
+  }
+  return [uy, uz];
+}
+function template(shape, pts) {
+  let ty, tz;
+  if (shape === "custom") {
+    const P = (pts && pts.length >= 3) ? pts : [[0, 0], [1, 0], [1, 1], [0, 1]];
+    ty = P.map(p => p[0]).concat([P[0][0]]);
+    tz = P.map(p => p[1]).concat([P[0][1]]);
+  } else if (shape === "square") { ty = [0, 1, 1, 0, 0]; tz = [0, 0, 1, 1, 0]; }
+  else if (shape === "right") { ty = [0, 1, 0, 0]; tz = [0, 0, 1, 0]; }
+  else if (shape === "equilateral") { ty = [0, 1, 0.5, 0]; tz = [0, 0, Math.sqrt(3) / 2, 0]; }
+  else if (shape === "semicircle") {
+    ty = [0]; tz = [0];
+    for (let k = 0; k < 40; k++) { const ang = Math.PI * k / 39; ty.push(0.5 + 0.5 * Math.cos(ang)); tz.push(0.5 * Math.sin(ang)); }
+  } else return null;
+  return densify(ty, tz, NPAR);
+}
+
+// shoelace area of a closed polygon [[y,z],...]  (the coefficient c in c*L^2)
+function shoelace(pts) {
+  let s = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const [y1, z1] = pts[i], [y2, z2] = pts[(i + 1) % pts.length];
+    s += y1 * z2 - y2 * z1;
+  }
+  return Math.abs(s) / 2;
+}
+function parsePoints(text) {
+  const pts = [];
+  for (const chunk of (text || "").split(";")) {
+    const c = chunk.trim();
+    if (!c) continue;
+    const yz = c.split(",");
+    if (yz.length !== 2) throw new Error("each point needs 'y,z'");
+    pts.push([parseFloat(yz[0]), parseFloat(yz[1])]);
+  }
+  if (pts.length < 3) throw new Error("custom shape needs at least 3 points 'y,z; y,z; y,z'");
+  if (pts.some(p => !isFinite(p[0]) || !isFinite(p[1]))) throw new Error("custom points must be numbers");
+  return pts;
+}
+
+// ---- cross-section area A(x) ----------------------------------------------
+function areaFn(shape, fF, gF, coeff) {
+  if (shape === "disk") return x => Math.PI * (fF(x) ** 2 - gF(x) ** 2);
+  const c = { square: 1, semicircle: Math.PI / 8, equilateral: Math.sqrt(3) / 4, right: 0.5, custom: coeff }[shape];
+  return x => c * (fF(x) - gF(x)) ** 2;
+}
+function areaLabel(shape, hasG, coeff) {
+  const L = hasG ? "(f − g)²" : "f²";
+  if (shape === "disk") return hasG ? "π·(f² − g²)" : "π·f²";
+  const c = { square: "", semicircle: "(π/8)·", equilateral: "(√3/4)·", right: "(1/2)·",
+              custom: coeff.toFixed(4) + "·" }[shape];
+  return c + L;
+}
+
+// ---- 3D geometry ----------------------------------------------------------
+function radiusSurface(xs, th, R, color, op) {
+  const X = [], Y = [], Z = [];
+  for (let t = 0; t < th.length; t++) {
+    const xr = [], yr = [], zr = [];
+    for (let j = 0; j < xs.length; j++) { xr.push(xs[j]); yr.push(R[j] * Math.cos(th[t])); zr.push(R[j] * Math.sin(th[t])); }
+    X.push(xr); Y.push(yr); Z.push(zr);
+  }
+  return { type: "surface", x: X, y: Y, z: Z, showscale: false, opacity: op, hoverinfo: "skip",
+           colorscale: [[0, color], [1, color]], surfacecolor: X.map(r => r.map(() => 0)) };
+}
+function solidTraces(shape, fF, gF, a, s, tmpl) {
+  const xs = linspace(a, Math.max(s, a + 1e-6), M);
+  if (shape === "disk") {
+    const th = linspace(0, 2 * Math.PI, NTH);
+    const R = xs.map(fF), G = xs.map(gF);
+    const out = [radiusSurface(xs, th, R, SOLID, 0.55)];
+    if (G.some(v => Math.abs(v) > 1e-9)) out.push(radiusSurface(xs, th, G, INNER, 0.7));
+    return out;
+  }
+  const [ty, tz] = tmpl;
+  const X = [], Y = [], Z = [];
+  for (let u = 0; u < ty.length; u++) {
+    const xr = [], yr = [], zr = [];
+    for (let j = 0; j < xs.length; j++) { const L = fF(xs[j]) - gF(xs[j]), g0 = gF(xs[j]); xr.push(xs[j]); yr.push(g0 + L * ty[u]); zr.push(L * tz[u]); }
+    X.push(xr); Y.push(yr); Z.push(zr);
+  }
+  return [{ type: "surface", x: X, y: Y, z: Z, showscale: false, opacity: 0.55, hoverinfo: "skip",
+            colorscale: [[0, SOLID], [1, SOLID]], surfacecolor: X.map(r => r.map(() => 0)) }];
+}
+function leadingFace(shape, fF, gF, s, tmpl) {
+  let yb = [], zb = [];
+  if (shape === "disk") {
+    const R = fF(s);
+    for (let k = 0; k < 80; k++) { const t = 2 * Math.PI * k / 79; yb.push(R * Math.cos(t)); zb.push(R * Math.sin(t)); }
+  } else {
+    const [ty, tz] = tmpl, L = fF(s) - gF(s), g0 = gF(s);
+    for (let k = 0; k < ty.length; k++) { yb.push(g0 + L * ty[k]); zb.push(L * tz[k]); }
+  }
+  const xb = yb.map(() => s);
+  const outline = { type: "scatter3d", mode: "lines", x: xb, y: yb, z: zb, line: { color: FACE, width: 6 }, hoverinfo: "skip" };
+  const cy = mean(yb), cz = mean(zb);
+  const X = xb.concat([s]), Y = yb.concat([cy]), Z = zb.concat([cz]), c = xb.length;
+  const I = [], J = [], K = [];
+  for (let k = 0; k < c - 1; k++) { I.push(k); J.push(k + 1); K.push(c); }
+  const fill = { type: "mesh3d", x: X, y: Y, z: Z, i: I, j: J, k: K, color: FACE, opacity: 0.4, hoverinfo: "skip" };
+  return [fill, outline];
+}
+function frame(shape, fF, gF, a, b, tmpl) {
+  const xs = linspace(a, b, 120), ff = xs.map(fF), gg = xs.map(gF);
+  let ymin, ymax, zmin, zmax, yr, zr;
+  if (shape === "disk") {
+    const rmax = Math.max(...ff.map(Math.abs), ...gg.map(Math.abs), 1e-9);
+    ymin = -rmax; ymax = rmax; zmin = -rmax; zmax = rmax; yr = zr = 2 * rmax;
+  } else {
+    const [, tz] = tmpl, L = xs.map((_, i) => ff[i] - gg[i]);
+    ymin = Math.min(...gg, ...ff); ymax = Math.max(...ff, ...gg); zmin = 0; zmax = Math.max(...L) * Math.max(...tz);
+    yr = ymax - ymin; zr = zmax - zmin;
+  }
+  const pad = 0.05, padr = (lo, hi) => { const sp = (hi - lo) || 1; return [lo - sp * pad, hi + sp * pad]; };
+  const cross = Math.max(yr, zr, 1e-6);
+  return { xr: padr(a, b), yr: padr(ymin, ymax), zr: padr(zmin, zmax),
+           aspect: { x: 2.6, y: Math.max(yr, 1e-6) / cross, z: Math.max(zr, 1e-6) / cross } };
+}
+
+// ---- 2D panel -------------------------------------------------------------
+function build2d(fF, gF, a, b, s, showRects) {
+  const xs = linspace(a, b, 240);
+  const data = [
+    { x: xs, y: xs.map(gF), mode: "lines", line: { width: 0 }, hoverinfo: "skip", showlegend: false },
+    { x: xs, y: xs.map(fF), mode: "lines", fill: "tonexty", fillcolor: REGION,
+      line: { color: CURVE, width: 3 }, name: "region under f(x)" },
+  ];
+  const xss = linspace(a, Math.max(s, a + 1e-6), 160);
+  data.push({ x: xss, y: xss.map(gF), mode: "lines", line: { width: 0 }, hoverinfo: "skip", showlegend: false });
+  data.push({ x: xss, y: xss.map(fF), mode: "lines", fill: "tonexty", fillcolor: SWEPT,
+              line: { width: 0 }, name: "swept so far", hoverinfo: "skip" });
+  data.push({ x: [s, s], y: [gF(s), fF(s)], mode: "lines", line: { color: FACE, width: 5 }, name: "slice at x=" + s.toFixed(2) });
+  const shapes = [];
+  if (showRects) {
+    const n = 12, edges = linspace(a, b, n + 1);
+    for (let i = 0; i < n; i++) {
+      const mid = 0.5 * (edges[i] + edges[i + 1]);
+      if (mid > s) continue;
+      shapes.push({ type: "rect", x0: edges[i], x1: edges[i + 1], y0: gF(mid), y1: fF(mid),
+                    line: { color: CURVE, width: 1 }, fillcolor: "rgba(27,58,91,0.10)" });
+    }
+  }
+  const layout = { title: "Region under the curve", template: "plotly_white", uirevision: "keep",
+                   xaxis: { title: "x" }, yaxis: { title: "y" }, shapes,
+                   margin: { l: 40, r: 10, t: 40, b: 40 }, legend: { font: { size: 11 } },
+                   paper_bgcolor: "rgba(0,0,0,0)" };
+  return { data, layout };
+}
+
+// ---- main update ----------------------------------------------------------
+function update() {
+  const shape = document.querySelector("input[name=shape]:checked").value;
+  const rects = $("rects").checked;
+  const out = $("readout");
+  let fF, gF, a, b, s, hasG, tmpl, coeff = 0;
+  try {
+    const fText = $("f").value, gText = $("g").value.trim();
+    fF = compileFn(fText);
+    hasG = gText.length > 0;
+    gF = hasG ? compileFn(gText) : (() => 0);
+    a = parseFloat($("a").value); b = parseFloat($("b").value);
+    if (!(isFinite(a) && isFinite(b) && b > a)) throw new Error("need numbers with a < b");
+    // sanity: make sure f is evaluable
+    if (!isFinite(fF((a + b) / 2))) throw new Error("could not evaluate f(x)");
+    s = Math.min(Math.max(parseFloat($("s").value), a), b);
+    let pts = null;
+    if (shape === "custom") { pts = parsePoints($("custom").value); coeff = shoelace(pts); }
+    tmpl = (shape === "disk") ? null : template(shape, pts);
+  } catch (e) {
+    out.innerHTML = '<span class="err">⚠ ' + e.message + "</span>";
+    return;
+  }
+
+  const A = areaFn(shape, fF, gF, coeff);
+  const built = integrate(A, a, s), total = integrate(A, a, b);
+
+  const { data: d2, layout: l2 } = build2d(fF, gF, a, b, s, rects);
+  Plotly.react("fig2d", d2, l2, { responsive: true, displaylogo: false });
+
+  const traces = solidTraces(shape, fF, gF, a, s, tmpl).concat(leadingFace(shape, fF, gF, s, tmpl));
+  const fr = frame(shape, fF, gF, a, b, tmpl);
+  const l3 = {
+    title: "Solid built so far", template: "plotly_white", showlegend: false, uirevision: "keep",
+    paper_bgcolor: "rgba(0,0,0,0)",
+    scene: {
+      xaxis: { title: "x", range: fr.xr }, yaxis: { title: "y", range: fr.yr }, zaxis: { title: "z", range: fr.zr },
+      aspectmode: "manual", aspectratio: fr.aspect,
+      camera: { eye: { x: 0, y: -2.6, z: 0 }, up: { x: 0, y: 0, z: 1 }, center: { x: 0, y: 0, z: 0 } }
+    },
+    margin: { l: 0, r: 0, t: 40, b: 0 }
+  };
+  Plotly.react("fig3d", traces, l3, { responsive: true, displaylogo: false });
+
+  out.innerHTML =
+    'Cross-section:&nbsp; A(x) = ' + areaLabel(shape, hasG, coeff) + " &nbsp;&nbsp;&nbsp; " +
+    '<span class="built">Built (x = ' + (+a) + " → " + s.toFixed(2) + "):&nbsp; V = " + built.toFixed(4) + "</span> &nbsp;&nbsp;&nbsp; " +
+    '<span class="total">Total (x = ' + (+a) + " → " + (+b) + "):&nbsp; V = " + total.toFixed(4) + "</span>";
+}
+
+// ---- controls -------------------------------------------------------------
+function syncSlider() {
+  const a = parseFloat($("a").value), b = parseFloat($("b").value);
+  if (!(isFinite(a) && isFinite(b) && b > a)) return;
+  const sEl = $("s");
+  sEl.min = a; sEl.max = b; sEl.step = (b - a) / 120;
+  if (!(parseFloat(sEl.value) >= a && parseFloat(sEl.value) <= b)) sEl.value = b;
+}
+function onChange() { syncSlider(); $("sval").textContent = "x = " + parseFloat($("s").value).toFixed(2); update(); }
+
+["f", "g", "a", "b", "custom"].forEach(id => $(id).addEventListener("input", onChange));
+$("rects").addEventListener("change", update);
+$("s").addEventListener("input", () => { $("sval").textContent = "x = " + parseFloat($("s").value).toFixed(2); update(); });
+document.querySelectorAll("input[name=shape]").forEach(r => r.addEventListener("change", update));
+
+window.addEventListener("load", onChange);
+</script>
+</body>
+</html>
