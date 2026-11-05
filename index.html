@@ -6,14 +6,16 @@
     <meta name="AUTHOR" content="Shyam Ravichandran (stolen from Daniel Groves who stole it from Cherie Galvex and more.)">
     <title>Shyam Ravichandran</title>
     <style>
+        /* Text grows with the screen width so it fills laptop and desktop screens */
+        html { font-size: clamp(16px, 1.1vw + 6px, 24px); }
         body {
             background-color: #E0F2FE;
             margin: 0;
             line-height: 1.45;
         }
         .page { padding: 16px 24px 32px; }
-        /* Text stays a readable width; the dividing lines run the full width of the screen */
-        .page > :not(hr) { max-width: 900px; }
+        /* The dividing lines run the full width of the screen */
+        .page > :not(hr) { max-width: 62em; }
 
         /* Header: name across the top, contact info on the left, photo on the right */
         .header {
@@ -29,7 +31,7 @@
         .header h2 { margin-top: 0; font-weight: normal; }
         .header .photo { grid-area: photo; }
         /* Photo shrinks on short screens so About Me still shows without scrolling */
-        .header img { display: block; width: auto; height: auto; max-width: min(480px, 45vw); max-height: 45vh; }
+        .header img { display: block; width: auto; height: auto; max-width: min(24em, 45vw); max-height: 45vh; }
 
         /* Sections */
         hr { margin: 24px -24px; border: 0; border-top: 1px solid #8A9BA8; }
@@ -42,11 +44,13 @@
             body { line-height: 1.4; }
             .page { padding: 4px 16px 24px; }
             hr { margin: 16px -16px; }
-            .header { grid-template-columns: 1fr 40%; grid-template-areas: "name name" "info photo"; column-gap: 12px; }
+            .header { grid-template-columns: 1fr 44%; column-gap: 12px; }
             .header h1 { font-size: 1.7em; margin-top: 0.4em; }
             .header h2 { font-size: 1.05em; margin-bottom: 0.6em; }
             .header .info p { margin: 0; font-size: 0.95em; }
-            .header img { max-width: 100%; max-height: none; }
+            /* Photo stays beside the name and contact info, cropped to a portrait around the person */
+            .header .photo { margin-top: 12px; }
+            .header img { width: 100%; max-width: 100%; max-height: none; aspect-ratio: 3 / 4; object-fit: cover; object-position: 50% 50%; }
             .section-title { margin-bottom: 8px; }
         }
     </style>
@@ -88,7 +92,8 @@
 
     <p class="section-title">Teaching</p>
     <ul>
-        <li><b>Fall 2026 </b> Calculus II Emerging Scholars Program (Math 181, Math 182)</li><li><b>Spring 2026:</b> Combinatorics (MCS421), Graph Theory (MCS423), Numerical Analysis (MCS471)</li>
+        <li><b>Fall 2026:</b> Calculus II Emerging Scholars Program (Math 181, Math 182)</li>
+        <li><b>Spring 2026:</b> Combinatorics (MCS421), Graph Theory (MCS423), Numerical Analysis (MCS471)</li>
         <li><b>Fall 2025:</b> Calculus I (Math 180)</li>
         <li><b>Summer 2025:</b> <a href="https://sites.google.com/view/yspatuic/">Young Scholars Program</a></li>
         <li><b>Fall 2024, Spring 2025:</b> Calculus II (Math 181)</li>
@@ -96,8 +101,9 @@
 
     <hr>
 
-    <p class="section-title">Service</p>
+    <p class="section-title">Outreach and Service</p>
     <ul>
+        <li><b>Spring 2026–Present:</b> Lead Teacher, <a href="https://www.mathcirclesofchicago.org/programs/math-circles">Math Circles of Chicago</a></li>
         <li><b>Fall 2025–Present:</b> Graduate Computer Science Theory Seminar Co-Organizer (with <a href="https://homepages.math.uic.edu/~cmizge2/">Clay Mizgerd</a>)</li>
         <li><b>Summer 2025–Present:</b> Math Graduate Student Association Co-President (with <a href="https://sites.google.com/view/naimanader/about">Naima Nader</a> and <a href="https://homepages.math.uic.edu/~swinton/">Min Winton</a>)</li>
         <li><b>Spring 2025–Present:</b> Directed Reading Program Mentor</li>
