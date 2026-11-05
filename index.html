@@ -1,161 +1,125 @@
-
-<html><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="AUTHOR" content="Shyam Ravichandran (stolen from Daniel Groves who stole it from Cherie Galvex and more.)">
     <title>Shyam Ravichandran</title>
-    </head>
-    
-    <body body="" style="background-color:#E0F2FE;">
-        
-    <table border="0" cellpadding="10">
-    <tbody>
-    <tr valign="top">
-    <td>
-    <table border="0" cellpadding="5">
-    <tbody>
-    <tr>
-    
-    <td>
-    <p>
-    </p><h1>
-    Shyam Ravichandran<br>
-    </h1><h2> Ph.D. Student<br>
-    University of Illinois Chicago  </h2>
-    
-    <p><strong>Contact Information</strong><br>
-    Office: SEO 735<br>
-    E-mail: sravi42 (at) uic (dot) edu <br>
-    <br>
-    <b>Mailing address:</b> <br>
-    Department of Mathematics, Statistics, and Computer Science<br>
-    University of Illinois Chicago<br>
-    322 Science and Engineering Offices (M/C 249)<br>
-    851 S. Morgan St.<br>
-    Chicago, IL 60607-7045<br>
-    USA
-    
-     
-    </p></td>
-    
-    <td>
-        <div style="text-align: right;">
-            <a href="https://christpluso.github.io"><img  width="480" height="360" src="IMG_0031.jpeg" alt="a pic of me"></a>
+    <style>
+        body {
+            background-color: #E0F2FE;
+            margin: 0;
+            line-height: 1.45;
+        }
+        .page { padding: 16px 24px 32px; }
+        /* Text stays a readable width; the dividing lines run the full width of the screen */
+        .page > :not(hr) { max-width: 900px; }
+
+        /* Header: name across the top, contact info on the left, photo on the right */
+        .header {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            grid-template-areas: "name photo" "info photo";
+            grid-template-rows: auto 1fr;
+            align-items: start;
+            column-gap: 32px;
+        }
+        .header h1 { grid-area: name; margin: 0.5em 0 0.2em; }
+        .header .info { grid-area: info; }
+        .header h2 { margin-top: 0; font-weight: normal; }
+        .header .photo { grid-area: photo; }
+        /* Photo shrinks on short screens so About Me still shows without scrolling */
+        .header img { display: block; width: auto; height: auto; max-width: min(480px, 45vw); max-height: 45vh; }
+
+        /* Sections */
+        hr { margin: 24px -24px; border: 0; border-top: 1px solid #8A9BA8; }
+        .section-title { font-size: 1.15em; font-weight: bold; margin: 0 0 12px; }
+        ul, ol { margin: 0; padding-left: 1.5em; }
+        li ul { margin-top: 4px; }
+        li { margin-bottom: 6px; }
+
+        @media (max-width: 600px) {
+            body { line-height: 1.4; }
+            .page { padding: 4px 16px 24px; }
+            hr { margin: 16px -16px; }
+            .header { grid-template-columns: 1fr 40%; grid-template-areas: "name name" "info photo"; column-gap: 12px; }
+            .header h1 { font-size: 1.7em; margin-top: 0.4em; }
+            .header h2 { font-size: 1.05em; margin-bottom: 0.6em; }
+            .header .info p { margin: 0; font-size: 0.95em; }
+            .header img { max-width: 100%; max-height: none; }
+            .section-title { margin-bottom: 8px; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="page">
+
+    <div class="header">
+        <h1>Shyam Ravichandran</h1>
+        <div class="info">
+            <h2>PhD Candidate<br>
+            University of Illinois Chicago</h2>
+
+            <p><strong>Contact Information</strong><br>
+            Office: SEO 735<br>
+            E-mail: <span style="white-space: nowrap;">sravi42 (at) uic (dot) edu</span></p>
         </div>
-    
-   
 
-    </td>
-    </tr></tbody>
-    </table>
-    
-    
-    <br>
-    
-    
+        <a class="photo" href="https://christpluso.github.io"><img width="480" height="360" src="IMG_0031.jpeg" alt="a pic of me"></a>
+    </div>
+
     <hr>
-    
-    <br>
-    <b> About Me </b>
-    
-    <br><br>
-    
-<div class="text" white-space:="" pre-line="">Hi! My name is Shyam Ravichandran and I’m a third-year Ph.D. student in Mathematical Computer Science. My research interests are broadly centered in Probability and Combinatorics, specifically their applications to Learning, Game Theory, and other problems in Theoretical Computer Science. Inside the department, I serve as the organizer of the Graduate Combinatorics and Computer Science Theory seminar with <a href="https://homepages.math.uic.edu/~cmizge2/">Clay Mizgerd</a>. Previously, I served as the Co-President of the Mathematical Graduate Student Association (<a href="https://mgsa.math.uic.edu">MGSA</a>) alongside <a href="https://sites.google.com/view/naimanader/about/">Naima Nader</a> and Min Winton. Our department offers a uniquely collaborative environment through MGSA, which hosts our department tea and the Graduate Student Colloquium, fostering a rich community between subfields.  Previously, I recently completed my undergrad at Purdue University where I double majored Applied Mathematics and Statistics while completing a certificate in Data Science. Outside the university, I am an avid traveler, basketball fan, and runner.  
+
+    <p class="section-title">About Me</p>
+    <p>Hi! My name is Shyam Ravichandran and I’m a third-year Ph.D. Candidate in Mathematical Computer Science. I am fortunate to be advised by <a href="https://jainvishesh.github.io">Vishesh Jain</a> and <a href="https://www.levreyzin.com">Lev Reyzin</a>. My research interests are broadly centered in Probability, Combinatorics, and Algorithms, and their applications to Theoretical Computer Science. Previously, I was undergrad at Purdue University where I majored Applied Mathematics and Statistics.</p>
+
+    <hr>
+
+    <p class="section-title">Publications</p>
+    <ul>
+        <li><b><a href="https://arxiv.org/abs/2611.03547">Exact Sum-of-Radii Clustering under Any Constant Stability</a></b> (<i>Submitted to STOC 2027</i>)
+            <ul><li>with Lev Reyzin</li></ul></li>
+        <li><b><a href="https://arxiv.org/abs/2605.04300">Thinned Quantile Shares are Universally Feasible</a></b> (<i>To appear in ACM-SIAM Symposium on Discrete Algorithms (SODA 2027)</i>)
+            <ul><li>with Vishesh Jain and <a href="https://homepages.math.uic.edu/~cmizge2/">Clay Mizgerd</a></li></ul></li>
+    </ul>
+
+    <hr>
+
+    <p class="section-title">Teaching</p>
+    <ul>
+        <li><b>Fall 2026 </b> Calculus II Emerging Scholars Program (Math 181, Math 182)</li><li><b>Spring 2026:</b> Combinatorics (MCS421), Graph Theory (MCS423), Numerical Analysis (MCS471)</li>
+        <li><b>Fall 2025:</b> Calculus I (Math 180)</li>
+        <li><b>Summer 2025:</b> <a href="https://sites.google.com/view/yspatuic/">Young Scholars Program</a></li>
+        <li><b>Fall 2024, Spring 2025:</b> Calculus II (Math 181)</li>
+    </ul>
+
+    <hr>
+
+    <p class="section-title">Service</p>
+    <ul>
+        <li><b>Fall 2025–Present:</b> Graduate Computer Science Theory Seminar Co-Organizer (with <a href="https://homepages.math.uic.edu/~cmizge2/">Clay Mizgerd</a>)</li>
+        <li><b>Summer 2025–Present:</b> Math Graduate Student Association Co-President (with <a href="https://sites.google.com/view/naimanader/about">Naima Nader</a> and <a href="https://homepages.math.uic.edu/~swinton/">Min Winton</a>)</li>
+        <li><b>Spring 2025–Present:</b> Directed Reading Program Mentor</li>
+        <li><b>Spring 2025–Present:</b> Symbols of Inclusion, Undergraduate Mentorship Organizer</li>
+    </ul>
+
+    <hr>
+
+    <p class="section-title">Interactive Teaching Tools</p>
+    <ul>
+        <li><a href="slicing-explorer/">Volumes by Slicing Explorer</a> &mdash; build solids of revolution and known-cross-section solids one slice at a time (Calc II / Math&nbsp;181).</li>
+    </ul>
+
+    <hr>
+
+    <p class="section-title">Current Research Interests</p>
+    <p>Probability Theory, Probabilistic Combinatorics, Theoretical Computer Science, Machine Learning</p>
+
+    <hr>
+
+    <p><a href="https://mscs.uic.edu/">Mathematics Department Home Page</a></p>
+
 </div>
-<br>
-<hr>
-    <br>
-    <b> Service </b>
-    
-    <br><br>
-</li><li><b>Fall 2025-Present: </b> Graduate Computer Science Theory Seminar Co-Organizer (with Clay Mizgerd)   
-</li><li><b>Summer 2025-Present: </b> Math Graduate Student Association Co-President (with Naima Nader and <a href="https://homepages.math.uic.edu/~swinton/">Min Winton</a>)
-</li><li><b>Spring 2025-Present:</b> Directed Reading Program Mentor
-</li><li><b>Spring 2025-Present:</b> Symbols of Inclusion, Undergraduate Mentorship Organizer
-
-
-
-    <br>
-
-<br>
-<hr>
-    <br>
-    <b> Teaching </b>
-    
-    <br><br>
-</li><li><b>Spring 2026:</b> Combinatorics (MCS421), Graph Theory (MCS423), Numerical Analysis (MCS471)
-</li><li><b>Fall 2025:</b> Calculus I (Math 180)
-</li><li><b>Summer 2025: </b> <a href="https://sites.google.com/view/yspatuic/">Young Scholars Program</a> 
-<br/>
-</li><li><b>Fall 2024, Spring 2025:</b> Calculus II (Math 181)
-
-
-
-    <br>
-    <br>
-
-    <hr>
-
-    <br>
-    <b> Interactive Teaching Tools </b>
-
-    <br><br>
-    </li><li><a href="slicing-explorer/">Volumes by Slicing Explorer</a> &mdash; build solids of revolution and known-cross-section solids one slice at a time (Calc II / Math&nbsp;181).
-
-    <br>
-    <br>
-
-    <hr>
-    
-    <br>
-    
-    <b> Office Hours (Spring 2026) in MSLC </b>
-    
-    <br>
-    <br>
-    </li><li> <b>Monday:</b> 11-12 pm
-    </li><li> <b>Tuesday:</b> 1-3 pm
-    
-    
-    <br>
-    <br>
-    
-    <hr>
-    
-    
-    
-    <p><strong> Current Research Interests</strong><br>
-    <br>
-    
-    Probability Theory, Probabilistic Combinatorics, Theoretical Computer Science, Machine Learning
-    
-    <br>
-    
-    </p><hr>
-    
-    <p><font size="+1"><b><a href="Ravichandran_Shyam.pdf"> Current CV </a> </b> </font>
-    
-    
-    <br>
-    
-    </p><hr>
-    
-    <!-- <p><font size="+1"><b> Conferences:<br><br> </b></font><b>
-    
-    
-    <a href="https://www.math.uic.edu/conferences/cubes_man"> Cube complexes and 3-manifolds</a>, May 20-30, 2013 at UIC.
-    
-    <br><br>
-    
-    <a href="Conferences/2011/UICGGGTLogic/Workshop_August_2011/Main.html">Geometric group theory and logic: The elementary theory of groups</a>, August 2011, UIC.
-    
-    
-    <br><br> -->
-    
-    
-    
-    <!-- </b></p><hr><b>
-     --> 
-    <p><a target="_top" href="https://mscs.uic.edu/">Mathematics Department Home Page</a> </p>
-    
-    
-    </li></td></tr></tbody></table>
-    <div class="glasp-extension-toaster" style="display: block; width: 320px; margin: unset; padding: unset; border: unset; border-radius: unset; outline: unset; background-color: unset; box-shadow: unset; position: fixed; top: 40px; right: 24px; z-index: 9999;"></div><div class="glasp-extension" style="display: block; width: unset; margin: unset; padding: unset; border: unset; border-radius: unset; outline: unset; background-color: unset; box-shadow: unset; position: fixed; bottom: 16px; right: 16px; z-index: 9999;"></div></body></html>
+</body>
+</html>
